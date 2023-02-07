@@ -26,9 +26,11 @@ export class ProductController {
 
   @Get('/:id')
   async getProduct(@Param('id') id: string) {
-    const product = await this.productService.getProduct(id);
-    if (!product) throw new NotFoundException('Product does not exist!');
-    return product;
+    try {
+      return await this.productService.getProduct(id);
+    } catch {
+      this.throwNotFoundException();
+    }
   }
 
   @Post('/')
@@ -41,18 +43,23 @@ export class ProductController {
     @Param('id') id: string,
     @Body() createProductDto: CreateProductDto,
   ) {
-    const product = await this.productService.updateProduct(
-      id,
-      createProductDto,
-    );
-    if (!product) throw new NotFoundException('Product does not exist!');
-    return product;
+    try {
+      return await this.productService.updateProduct(id, createProductDto);
+    } catch {
+      this.throwNotFoundException();
+    }
   }
 
   @Delete('/:id')
   async deteleProduct(@Param('id') id: string) {
-    const product = await this.productService.deleteProduct(id);
-    if (!product) throw new NotFoundException('Product does not exist!');
-    return product;
+    try {
+      return await this.productService.deleteProduct(id);
+    } catch {
+      this.throwNotFoundException();
+    }
+  }
+
+  private throwNotFoundException() {
+    throw new NotFoundException('Product does not exist!');
   }
 }

@@ -5,6 +5,7 @@ import {
   UseGuards,
   Request,
   Get,
+  Put,
 } from '@nestjs/common';
 import { CreateUserDto } from 'src/user/dtos/create-user.dto';
 import { UserService } from 'src/user/user.service';
@@ -24,14 +25,13 @@ export class AuthController {
 
   @Post('/register')
   async register(@Body() createUserDto: CreateUserDto) {
-    const user = await this.userService.addUser(createUserDto);
-    return user;
+    return await this.userService.addUser(createUserDto);
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(@Request() req) {
-    return this.authService.login(req.user);
+    return await this.authService.login(req.user);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -39,6 +39,13 @@ export class AuthController {
   @Get('/user')
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.User)
+  @Put('/user')
+  async updateProfile(@Request() req, @Body() createUserDto: CreateUserDto) {
+    return await this.userService.updateUser(req.user.userId, createUserDto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

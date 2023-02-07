@@ -14,11 +14,17 @@ export class UserService {
   async addUser(createUserDto: CreateUserDto): Promise<User> {
     const newUser = await this.userModel.create(createUserDto);
     newUser.password = await bCrypt.hash(newUser.password, 10);
+
     return newUser.save();
   }
 
   async findUser(username: string): Promise<User | undefined> {
-    const user = await this.userModel.findOne({ username: username });
-    return user;
+    return await this.userModel.findOne({ username: username });
+  }
+
+  async updateUser(id: string, createUserDto: CreateUserDto): Promise<User> {
+    return await this.userModel.findByIdAndUpdate(id, createUserDto, {
+      new: true,
+    });
   }
 }
