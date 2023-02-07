@@ -36,8 +36,7 @@ export class ProductService {
   }
 
   async getProduct(id: string): Promise<Product> {
-    const product = await this.productModel.findById(id).exec();
-    return product;
+    return await this.productModel.findById(id).exec();
   }
 
   async addProduct(createProductDto: CreateProductDto): Promise<Product> {
