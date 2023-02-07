@@ -48,12 +48,9 @@ export class ProductService {
     id: string,
     createProductDto: CreateProductDto,
   ): Promise<Product> {
-    const updatedProduct = await this.productModel.findByIdAndUpdate(
-      id,
-      createProductDto,
-      { new: true },
-    );
-    return updatedProduct;
+    return await this.productModel.findByIdAndUpdate(id, createProductDto, {
+      new: true,
+    });
   }
 
   async deleteProduct(id: string): Promise<any> {
