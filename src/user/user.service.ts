@@ -21,4 +21,10 @@ export class UserService {
   async findUser(username: string): Promise<User | undefined> {
     return await this.userModel.findOne({ username: username });
   }
+
+  async updateUser(id: string, createUserDto: CreateUserDto): Promise<User> {
+    return await this.userModel.findByIdAndUpdate(id, createUserDto, {
+      new: true,
+    });
+  }
 }
