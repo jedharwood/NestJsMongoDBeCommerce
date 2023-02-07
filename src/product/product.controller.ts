@@ -33,8 +33,7 @@ export class ProductController {
 
   @Post('/')
   async addProduct(@Body() createProductDto: CreateProductDto) {
-    const product = await this.productService.addProduct(createProductDto);
-    return product;
+    return await this.productService.addProduct(createProductDto);
   }
 
   @Put('/:id')
