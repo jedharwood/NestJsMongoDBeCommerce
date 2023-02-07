@@ -19,15 +19,9 @@ export class ProductController {
 
   @Get('/')
   async getProducts(@Query() filterProductDto: FilterProductDto) {
-    if (Object.keys(filterProductDto).length) {
-      const filteredProducts = await this.productService.getFilteredProducts(
-        filterProductDto,
-      );
-      return filteredProducts;
-    } else {
-      const allProducts = await this.productService.getAllProducts();
-      return allProducts;
-    }
+    return Object.keys(filterProductDto).length
+      ? await this.productService.getFilteredProducts(filterProductDto)
+      : await this.productService.getAllProducts();
   }
 
   @Get('/:id')
@@ -39,8 +33,7 @@ export class ProductController {
 
   @Post('/')
   async addProduct(@Body() createProductDto: CreateProductDto) {
-    const product = await this.productService.addProduct(createProductDto);
-    return product;
+    return await this.productService.addProduct(createProductDto);
   }
 
   @Put('/:id')
