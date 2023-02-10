@@ -59,7 +59,7 @@ export class ProductController {
     }
   }
 
-  private throwNotFoundException() {
+  private throwNotFoundException(): void {
     throw new NotFoundException('Product does not exist!');
   }
 }
