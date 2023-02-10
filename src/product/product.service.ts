@@ -15,20 +15,32 @@ export class ProductService {
   async getFilteredProducts(
     filterProductDto: FilterProductDto,
   ): Promise<Product[]> {
+    type FilterParam<T extends string> = {
+      [P in T]: {
+        $regex: string;
+        $options: string;
+      };
+    };
+
     const { category, search } = filterProductDto;
-    let products = await this.getAllProducts();
+    const queries: (
+      | FilterParam<'name'>
+      | FilterParam<'description'>
+      | FilterParam<'category'>
+    )[] = [];
 
     if (search) {
-      products = products.filter(
-        (p) => p.name.includes(search) || p.description.includes(search),
+      queries.push(
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
       );
     }
 
     if (category) {
-      products = products.filter((p) => p.category === category);
+      queries.push({ category: { $regex: category, $options: 'i' } });
     }
 
-    return products;
+    return this.productModel.find({ $or: queries });
   }
 
   async getAllProducts(): Promise<Product[]> {
