@@ -12,6 +12,14 @@ export class ProductService {
     private readonly productModel: Model<ProductDocument>,
   ) {}
 
+  async getAllProducts(): Promise<Product[]> {
+    return await this.productModel.find().exec();
+  }
+
+  async getProduct(id: string): Promise<Product> {
+    return await this.productModel.findById(id).exec();
+  }
+
   async getFilteredProducts(
     filterProductDto: FilterProductDto,
   ): Promise<Product[]> {
@@ -40,21 +48,11 @@ export class ProductService {
       queries.push({ category: { $regex: category, $options: 'i' } });
     }
 
-    return this.productModel.find({ $or: queries });
-  }
-
-  async getAllProducts(): Promise<Product[]> {
-    return await this.productModel.find().exec();
-  }
-
-  async getProduct(id: string): Promise<Product> {
-    return await this.productModel.findById(id).exec();
+    return this.productModel.find({ $or: queries }).exec();
   }
 
   async addProduct(createProductDto: CreateProductDto): Promise<Product> {
-    const newProduct = await this.productModel.create(createProductDto);
-
-    return newProduct.save();
+    return await this.productModel.create(createProductDto);
   }
 
   async updateProduct(
