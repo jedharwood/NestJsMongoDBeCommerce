@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { CartRepository } from './cart.repository';
 import { ItemDto } from './dtos/item.dto';
 import { UpdateQuantityDto } from './dtos/update-quantity.dto';
 import { Cart, CartDocument } from './schemas/cart.schema';
@@ -8,9 +7,7 @@ import { Item } from './schemas/item.schema';
 
 @Injectable()
 export class CartService {
-  constructor(
-    @InjectModel('Cart') private readonly cartModel: Model<CartDocument>,
-  ) {}
+  constructor(private readonly cartRepository: CartRepository) {}
 
   private getItemIndex(items: Item[], productId: string): number {
     return items.findIndex((i) => i.productId === productId);
@@ -20,23 +17,6 @@ export class CartService {
     cart.totalPrice = 0;
     cart.items.forEach((item) => {
       cart.totalPrice += item.quantity * item.price;
-    });
-  }
-
-  private async getCart(userId: string): Promise<CartDocument> {
-    return await this.cartModel.findOne({ userId });
-  }
-
-  private async createCart(
-    userId: string,
-    itemDto: ItemDto,
-    subTotalPrice: number,
-    totalPrice: number,
-  ): Promise<Cart> {
-    return await this.cartModel.create({
-      userId,
-      items: [{ ...itemDto, subTotalPrice }],
-      totalPrice,
     });
   }
 
@@ -51,19 +31,18 @@ export class CartService {
     cart.items[itemIndex] = item;
     this.recalculateCart(cart);
 
-    return cart.save();
+    return this.cartRepository.save(cart);
   }
 
   async addItemToCart(userId: string, itemDto: ItemDto): Promise<Cart> {
     const { productId, quantity, price } = itemDto;
     const subTotalPrice = quantity * price;
 
-    const cart = await this.getCart(userId);
+    const cart = await this.cartRepository.getCart(userId);
     if (!cart) {
-      return await this.createCart(
+      return await this.cartRepository.createCart(
         userId,
-        itemDto,
-        subTotalPrice,
+        [{ ...itemDto, subTotalPrice }],
         subTotalPrice,
       );
     }
@@ -78,27 +57,27 @@ export class CartService {
       cart.items.push({ ...itemDto, subTotalPrice });
       this.recalculateCart(cart);
 
-      return cart.save();
+      return this.cartRepository.save(cart);
     }
   }
 
-  async removeItemFromCart(userId: string, productId: string): Promise<any> {
-    const cart = await this.getCart(userId);
+  async removeItemFromCart(userId: string, productId: string): Promise<Cart> {
+    const cart = await this.cartRepository.getCart(userId);
     const itemIndex = this.getItemIndex(cart.items, productId);
 
     if (itemIndex >= 0) {
       cart.items.splice(itemIndex, 1);
       this.recalculateCart(cart);
 
-      return cart.save();
+      return this.cartRepository.save(cart);
     }
   }
 
   async updateItemQuantity(
     userId: string,
     updateQuantityDto: UpdateQuantityDto,
-  ): Promise<any> {
-    const cart = await this.getCart(userId);
+  ): Promise<Cart> {
+    const cart = await this.cartRepository.getCart(userId);
     const itemIndex = this.getItemIndex(
       cart.items,
       updateQuantityDto.productId,
@@ -113,6 +92,6 @@ export class CartService {
   }
 
   async deleteCart(userId: string): Promise<Cart> {
-    return await this.cartModel.findOneAndRemove({ userId });
+    return await this.cartRepository.deleteCart(userId);
   }
 }
