@@ -1,33 +1,15 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
-import { CartRepository } from './cart.repository';
-import { Cart, CartDocument } from './schemas/cart.schema';
-import { Item } from './schemas/item.schema';
+import { CartRepository } from '../cart.repository';
+import { Cart, CartDocument } from '../schemas/cart.schema';
+import * as testData from './cart.testing-fixtures';
 
-describe('ProductService', () => {
-  const userOneId = 'user1';
-  const itemArray: Item[] = [
-    {
-      productId: 'product1',
-      name: 'Product 1',
-      quantity: 1,
-      price: 1,
-      subTotalPrice: 1,
-    },
-    {
-      productId: 'product2',
-      name: 'Product 2',
-      quantity: 2,
-      price: 2,
-      subTotalPrice: 4,
-    },
-  ];
-  const totalPrice = 5;
+describe('CartRepository', () => {
   const userOneCart: Cart = {
-    userId: userOneId,
-    items: itemArray,
-    totalPrice: totalPrice,
+    userId: testData.userOneId,
+    items: testData.arrayOfItems,
+    totalPrice: testData.userOneCartTotalPrice,
   };
 
   let cartRepository: CartRepository;
@@ -54,36 +36,49 @@ describe('ProductService', () => {
 
   describe('getCart', () => {
     it('should return null if .findOne returns no match', async () => {
+      // Arrange
       (cartModel.findOne as jest.Mock).mockReturnValue(null);
 
-      const result: Cart = await cartRepository.getCart(userOneId);
+      // Act
+      const result: Cart = await cartRepository.getCart(testData.userOneId);
 
+      // Assert
       expect(result).toBeNull();
       expect(cartModel.findOne).toHaveBeenCalledTimes(1);
-      expect(cartModel.findOne).toHaveBeenCalledWith({ userId: userOneId });
+      expect(cartModel.findOne).toHaveBeenCalledWith({
+        userId: testData.userOneId,
+      });
     });
 
     it('should return cart if .findOne returns a match', async () => {
+      // Arrange
       (cartModel.findOne as jest.Mock).mockReturnValue(userOneCart);
 
-      const result: Cart = await cartRepository.getCart(userOneId);
+      // Act
+      const result: Cart = await cartRepository.getCart(testData.userOneId);
 
+      // Assert
       expect(result).toEqual(userOneCart);
       expect(cartModel.findOne).toHaveBeenCalledTimes(1);
-      expect(cartModel.findOne).toHaveBeenCalledWith({ userId: userOneId });
+      expect(cartModel.findOne).toHaveBeenCalledWith({
+        userId: testData.userOneId,
+      });
     });
   });
 
   describe('createCart', () => {
     it('should create cart', async () => {
+      // Arrange
       (cartModel.create as jest.Mock).mockReturnValue(userOneCart);
 
+      // Act
       const result: Cart = await cartRepository.createCart(
-        userOneId,
-        itemArray,
-        totalPrice,
+        testData.userOneId,
+        testData.arrayOfItems,
+        testData.userOneCartTotalPrice,
       );
 
+      // Assert
       expect(result).toEqual(userOneCart);
       expect(cartModel.create).toHaveBeenCalledTimes(1);
       expect(cartModel.create).toHaveBeenCalledWith(userOneCart);
@@ -92,26 +87,32 @@ describe('ProductService', () => {
 
   describe('deleteCart', () => {
     it('should return null if .findOneAndRemove returns no match', async () => {
+      // Arrange
       (cartModel.findOneAndRemove as jest.Mock).mockReturnValue(null);
 
-      const result: Cart = await cartRepository.deleteCart(userOneId);
+      // Act
+      const result: Cart = await cartRepository.deleteCart(testData.userOneId);
 
+      // Assert
       expect(result).toBeNull();
       expect(cartModel.findOneAndRemove).toHaveBeenCalledTimes(1);
       expect(cartModel.findOneAndRemove).toHaveBeenCalledWith({
-        userId: userOneId,
+        userId: testData.userOneId,
       });
     });
 
     it('should delete cart if .findOneAndRemove returns a match', async () => {
+      // Arrange
       (cartModel.findOneAndRemove as jest.Mock).mockReturnValue(userOneCart);
 
-      const result: Cart = await cartRepository.deleteCart(userOneId);
+      // Act
+      const result: Cart = await cartRepository.deleteCart(testData.userOneId);
 
+      // Assert
       expect(result).toEqual(userOneCart);
       expect(cartModel.findOneAndRemove).toHaveBeenCalledTimes(1);
       expect(cartModel.findOneAndRemove).toHaveBeenCalledWith({
-        userId: userOneId,
+        userId: testData.userOneId,
       });
     });
   });
