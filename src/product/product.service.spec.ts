@@ -4,7 +4,6 @@ import { ProductService } from './product.service';
 import { Product, ProductDocument } from './schemas/product.schema';
 import { FilterProductDto } from './dtos/filter-product.dto';
 import { CreateProductDto } from './dtos/create-product.dto';
-
 import { Model } from 'mongoose';
 
 describe('ProductService', () => {
@@ -49,6 +48,10 @@ describe('ProductService', () => {
 
     productService = module.get<ProductService>(ProductService);
     productModel = module.get<Model<ProductDocument>>(getModelToken('Product'));
+  });
+
+  it('should be defined', () => {
+    expect(productService).toBeDefined();
   });
 
   describe('getAllProducts', () => {
