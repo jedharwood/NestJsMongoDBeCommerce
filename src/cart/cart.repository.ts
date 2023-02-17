@@ -10,7 +10,7 @@ export class CartRepository {
     @InjectModel('Cart') private readonly cartModel: Model<CartDocument>,
   ) {}
   async getCart(userId: string): Promise<CartDocument> {
-    return await this.cartModel.findOne({ userId });
+    return await this.cartModel.findOne({ userId }).exec();
   }
 
   async createCart(

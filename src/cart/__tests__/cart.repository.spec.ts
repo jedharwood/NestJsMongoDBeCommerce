@@ -36,8 +36,9 @@ describe('CartRepository', () => {
 
   describe('getCart', () => {
     it('should return null if .findOne returns no match', async () => {
-      // Arrange
-      (cartModel.findOne as jest.Mock).mockReturnValue(null);
+      (cartModel.findOne as jest.Mock).mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null),
+      });
 
       // Act
       const result: Cart = await cartRepository.getCart(testData.userOneId);
@@ -51,8 +52,9 @@ describe('CartRepository', () => {
     });
 
     it('should return cart if .findOne returns a match', async () => {
-      // Arrange
-      (cartModel.findOne as jest.Mock).mockReturnValue(userOneCart);
+      (cartModel.findOne as jest.Mock).mockReturnValue({
+        exec: jest.fn().mockResolvedValue(userOneCart),
+      });
 
       // Act
       const result: Cart = await cartRepository.getCart(testData.userOneId);
