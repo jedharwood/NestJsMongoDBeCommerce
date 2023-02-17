@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
-import { ProductService } from './product.service';
-import { Product, ProductDocument } from './schemas/product.schema';
-import { FilterProductDto } from './dtos/filter-product.dto';
-import { CreateProductDto } from './dtos/create-product.dto';
+import { ProductService } from '../product.service';
+import { Product, ProductDocument } from '../schemas/product.schema';
+import { FilterProductDto } from '../dtos/filter-product.dto';
+import { CreateProductDto } from '../dtos/create-product.dto';
 import { Model } from 'mongoose';
 
 describe('ProductService', () => {
